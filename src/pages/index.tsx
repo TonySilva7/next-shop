@@ -6,6 +6,7 @@ import Image from 'next/image'
 import shirt1 from '@app/assets/camisetas/1.png'
 import shirt2 from '@app/assets/camisetas/2.png'
 import shirt3 from '@app/assets/camisetas/3.png'
+import { GetServerSideProps } from 'next'
 
 export default function Home() {
   const [slideRef] = useKeenSlider<HTMLDivElement>({
@@ -48,4 +49,10 @@ export default function Home() {
       </HomeContainer>
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  return {
+    props: {},
+  }
 }
