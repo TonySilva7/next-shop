@@ -6,12 +6,13 @@ import stripe from '@app/lib/stripe'
 import { GetStaticProps, InferGetServerSidePropsType } from 'next'
 import Image from 'next/image'
 import Stripe from 'stripe'
+import Link from 'next/link'
 
 type Product = {
   id: string
   name: string
   imageUrl: string
-  price: number
+  price: string
 }
 
 type ProductProps = {
@@ -24,13 +25,18 @@ export const getStaticProps: GetStaticProps<ProductProps> = async () => {
   })
 
   const products = response.data.map((product) => {
-    const price = product.default_price as Stripe.Price
+    const priceCents = product.default_price as Stripe.Price
+    const price = (priceCents.unit_amount as number) / 100
+    const priceFormatted = new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(price)
 
     return {
       id: product.id,
       name: product.name,
       imageUrl: product.images[0],
-      price: (price.unit_amount as number) / 100,
+      price: priceFormatted,
     }
   })
 
@@ -38,6 +44,7 @@ export const getStaticProps: GetStaticProps<ProductProps> = async () => {
     props: {
       products,
     },
+    revalidate: 60 * 60 * 4, // 4 hours
   }
 }
 
@@ -54,19 +61,25 @@ export default function Home({ products }: PageProps) {
     <>
       <HomeContainer ref={slideRef} className="keen-slider">
         {products.map((product) => (
-          <ProductContainer key={product.id} className="keen-slider__slide">
-            <Image
-              src={product.imageUrl}
-              alt="Camiseta 1"
-              width={520}
-              height={480}
-              placeholder="empty"
-            />
-            <footer>
-              <strong>{product.name}</strong>
-              <span>{product.price}</span>
-            </footer>
-          </ProductContainer>
+          <Link href={`/product/${product.id}`} key={product.id}>
+            <ProductContainer
+              // href={`/product/${product.id}`}
+              // key={product.id}
+              className="keen-slider__slide"
+            >
+              <Image
+                src={product.imageUrl}
+                alt="Camiseta 1"
+                width={520}
+                height={480}
+                placeholder="empty"
+              />
+              <footer>
+                <strong>{product.name}</strong>
+                <span>{product.price}</span>
+              </footer>
+            </ProductContainer>
+          </Link>
         ))}
       </HomeContainer>
     </>
