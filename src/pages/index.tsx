@@ -1,13 +1,10 @@
 import { HomeContainer, ProductContainer } from '@app/styles/module'
-import { useKeenSlider } from 'keen-slider/react'
 import 'keen-slider/keen-slider.min.css'
+import { useKeenSlider } from 'keen-slider/react'
 
-import Image from 'next/image'
-import shirt1 from '@app/assets/camisetas/1.png'
-import shirt2 from '@app/assets/camisetas/2.png'
-import shirt3 from '@app/assets/camisetas/3.png'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import stripe from '@app/lib/stripe'
+import { GetStaticProps, InferGetServerSidePropsType } from 'next'
+import Image from 'next/image'
 import Stripe from 'stripe'
 
 type Product = {
@@ -21,9 +18,7 @@ type ProductProps = {
   products: Product[]
 }
 
-export const getServerSideProps: GetServerSideProps<
-  ProductProps
-> = async () => {
+export const getStaticProps: GetStaticProps<ProductProps> = async () => {
   const response = await stripe.products.list({
     expand: ['data.default_price'],
   })
@@ -46,7 +41,7 @@ export const getServerSideProps: GetServerSideProps<
   }
 }
 
-type PageProps = InferGetServerSidePropsType<typeof getServerSideProps>
+type PageProps = InferGetServerSidePropsType<typeof getStaticProps>
 
 export default function Home({ products }: PageProps) {
   const [slideRef] = useKeenSlider<HTMLDivElement>({
