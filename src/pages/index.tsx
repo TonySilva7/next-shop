@@ -3,10 +3,10 @@ import 'keen-slider/keen-slider.min.css'
 import { useKeenSlider } from 'keen-slider/react'
 
 import stripe from '@app/lib/stripe'
-import { GetStaticProps, InferGetServerSidePropsType } from 'next'
+import { GetStaticProps, InferGetStaticPropsType } from 'next'
 import Image from 'next/image'
-import Stripe from 'stripe'
 import Link from 'next/link'
+import Stripe from 'stripe'
 
 type Product = {
   id: string
@@ -48,9 +48,9 @@ export const getStaticProps: GetStaticProps<ProductProps> = async () => {
   }
 }
 
-type PageProps = InferGetServerSidePropsType<typeof getStaticProps>
+type HomeProps = InferGetStaticPropsType<typeof getStaticProps>
 
-export default function Home({ products }: PageProps) {
+export default function Home({ products }: HomeProps) {
   const [slideRef] = useKeenSlider<HTMLDivElement>({
     slides: {
       perView: 3,
