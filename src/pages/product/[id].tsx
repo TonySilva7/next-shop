@@ -6,6 +6,7 @@ import {
 } from '@app/styles/pages'
 import axios from 'axios'
 import { GetStaticProps, InferGetStaticPropsType } from 'next'
+import Head from 'next/head'
 import Image from 'next/image'
 import { useState } from 'react'
 import Stripe from 'stripe'
@@ -89,25 +90,31 @@ export default function ViewProduct({ product }: ViewProductProps) {
   }
 
   return (
-    <ProductItemContainer>
-      <ImageContainer>
-        <Image
-          src={product.imageUrl}
-          width={520}
-          height={480}
-          alt={product.description ?? ''}
-        />
-      </ImageContainer>
+    <>
+      <Head>
+        <title>{product.name} | E-commerce</title>
+      </Head>
 
-      <ProductDetailContainer>
-        <h1>{product.name}</h1>
-        <span>{product.price}</span>
-        <p>{product.description ?? ''}</p>
+      <ProductItemContainer>
+        <ImageContainer>
+          <Image
+            src={product.imageUrl}
+            width={520}
+            height={480}
+            alt={product.description ?? ''}
+          />
+        </ImageContainer>
 
-        <button onClick={handleBuyProduct} disabled={isLoading}>
-          Comprar agora
-        </button>
-      </ProductDetailContainer>
-    </ProductItemContainer>
+        <ProductDetailContainer>
+          <h1>{product.name}</h1>
+          <span>{product.price}</span>
+          <p>{product.description ?? ''}</p>
+
+          <button onClick={handleBuyProduct} disabled={isLoading}>
+            Comprar agora
+          </button>
+        </ProductDetailContainer>
+      </ProductItemContainer>
+    </>
   )
 }

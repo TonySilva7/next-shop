@@ -7,6 +7,7 @@ import { GetStaticProps, InferGetStaticPropsType } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import Stripe from 'stripe'
+import Head from 'next/head'
 
 type Product = {
   id: string
@@ -59,6 +60,9 @@ export default function Home({ products }: HomeProps) {
   })
   return (
     <>
+      <Head>
+        <title>Home | E-commerce</title>
+      </Head>
       <HomeContainer ref={slideRef} className="keen-slider">
         {products.map((product) => (
           <Link href={`/product/${product.id}`} key={product.id}>

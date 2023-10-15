@@ -3,12 +3,8 @@ import {
   ImageContainerSuccess,
   SuccessContainer,
 } from '@app/styles/pages/success'
-import {
-  GetServerSideProps,
-  InferGetServerSidePropsType,
-  InferGetStaticPropsType,
-  Redirect,
-} from 'next'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import Stripe from 'stripe'
@@ -21,8 +17,6 @@ type IReturnProduct = {
     imageUrl: string
     price: number
   }
-  // notFound: boolean
-  // redirect: Redirect
 }
 
 type IResponse = Stripe.Response<Stripe.Checkout.Session>
@@ -30,6 +24,15 @@ type IResponse = Stripe.Response<Stripe.Checkout.Session>
 export const getServerSideProps: GetServerSideProps<IReturnProduct> = async ({
   query,
 }) => {
+  if (!query.session_id) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  }
+
   const sessionId = String(query.session_id)
 
   const session: IResponse = await stripe.checkout.sessions.retrieve(
@@ -38,15 +41,6 @@ export const getServerSideProps: GetServerSideProps<IReturnProduct> = async ({
       expand: ['line_items', 'line_items.data.price.product'],
     },
   )
-
-  if (!session) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    }
-  }
 
   const customerName = session.customer_details?.name as string
   const product = session.line_items?.data[0].price?.product as Stripe.Product
@@ -72,18 +66,25 @@ type SuccessProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function Success({ customerName, product }: SuccessProps) {
   return (
-    <SuccessContainer>
-      <h1>Compra efetuada</h1>
+    <>
+      <Head>
+        <title>Compra efetuada | E-commerce</title>
+        <meta name="robots" content="noindex" />
+      </Head>
 
-      <ImageContainerSuccess>
-        <Image src={product.imageUrl} width={120} height={110} alt="" />
-      </ImageContainerSuccess>
-      <p>
-        Uhuul <strong>{customerName}</strong>, sua{' '}
-        <strong>{product.name}</strong> está a caminho.
-      </p>
+      <SuccessContainer>
+        <h1>Compra efetuada</h1>
 
-      <Link href="/">Voltar para home</Link>
-    </SuccessContainer>
+        <ImageContainerSuccess>
+          <Image src={product.imageUrl} width={120} height={110} alt="" />
+        </ImageContainerSuccess>
+        <p>
+          Uhuul <strong>{customerName}</strong>, sua{' '}
+          <strong>{product.name}</strong> está a caminho.
+        </p>
+
+        <Link href="/">Voltar ao catálogo</Link>
+      </SuccessContainer>
+    </>
   )
 }
